@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Bootstrap Paginator V3 Tests</title>
+    <title>后台管理系统</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/bootstrap-dialog.css">
     <script src="js/jquery.min.js" type="text/javascript"></script>
@@ -11,37 +11,105 @@
     <script src="js/bootstrap-paginator.js" type="text/javascript"></script>
 </head>
 <body>
-
-<div id="example" style="text-align: center"> <ul id="pageLimit"></ul> </div>
-
+<div style="float: left;width: 20%;">
+      <ul class="nav nav-pills nav-stacked">
+          <li class="active"><a onclick="login();">login</a></li>
+          <li><a href="#" onclick="userManage()">user-manage</a></li>
+          <li><a href="#" onclick="articleMange();">article-manage</a></li>
+          <li><a href="#" onclick="picMange();">pic-manage</a></li>
+          <li><a href="#" onclick="ipManage();">ip-manage</a></li>
+          <li><a href="#" onclick="chatManage();">chatlog-manage</a></li>
+    </ul>
+</div>
+<div class="main" style="float: right;width: 75%">
+    <div class="form-group">
+        <label for="name">username</label>
+        <input type="text" class="form-control" id="username" placeholder="请输入账号">
+    </div>
+    <div class="form-group">
+        <label for="name">password</label>
+        <input type="password" class="form-control" id="password" placeholder="请输入密码">
+    </div>
+    <div><button type="button" class="btn btn-primary" onclick="login();">登录</button></div>
+</div>
+<div class="main" style="float: right;width: 75%">
+    <div id="userContent"></div>
+</div>
+<div class="main" style="float: right;width: 75%">
+    <div id="content"></div>
+    <div id="example" style="text-align: center"> <ul id="pageLimit"></ul> </div>
+</div>
+<div class="main" style="float: right;width: 75%">
+    <div id="content"></div>
+    
+</div>
+<div class="main" style="float: right;width: 75%">
+    <div id="content"></div>
+    <div id="example" style="text-align: center"> <ul id="pageLimit"></ul> </div>
+</div>
 <script type="text/javascript">
+    function tologin(){
+        $(".main").css("display","none");
+        $(".main").eq(0).css("display","block");
 
-    $(function(){
-        var totalPage = 3;
-        var pageSize = 3;
-
+        if(checkLogin()==1){
+            $(".main").eq(0).html('<h2>已登录</h2>');
+        }
         
+    }
+    function userManage(){
+        $(".main").css("display","none");
+        $(".main").eq(1).css("display","block");
+        //查看所有用户信息
+        $.ajax({
+            url:'http://localhost:8083/manage/userlist',
+            type:'POST',
+            async: false,
+            dataType:'JSON',
+            success:function (callback) {
+                if(callback.code=="200"){
+                    
+                } else {
+                    
+                }
+            }
+        });
+
+    }
+    function articleMange(){
+        /*if(checkLogin()==0){
+            login();
+        }*/
+
+        $(".main").css("display","none");
+        $(".main").eq(2).css("display","block");
+
+        var pageNum = 6;
+        var totalPage = 3;
+
         $.ajax({
             url:'http://localhost:8083/manage/getArticles',
             type:'POST',
-            data:{'page':1,'count':pageSize},
+            async: false,
+            data:{'page':1,'pageSize':pageNum},
             dataType:'JSON',
             success:function (callback) {
-                var page_count=callback.page_count;
-                var page_cont=callback.page_content;
-                $('tbody').append(page_cont);
-                $('#last_page').text(page_count)
+                var list = callback.data.list;
+                var str = '';
+                for(var i=0;i<list.length;i++){
+                    str += '<div class="panel panel-default"><div class="panel-heading">'+ list[i].title+'作者：'+list[i].nickname+'时间'+ list[i].createTime +'</div><div class="panel-body">'+list[i].content+'</div></div>';
+                }
+                $('#content').html(str);
+                totalPage = callback.data.totalPage;
+                $('#last_page').text(totalPage);
             }
         });
-        
-
         $('#pageLimit').bootstrapPaginator({
             currentPage: 1,
             totalPages: totalPage,
             size:"normal",
             bootstrapMajorVersion: 3,
             alignment:"right",
-            numberOfPages:pageSize,
             itemTexts: function (type, page, current) {
                 switch (type) {
                 case "first": return "首页";
@@ -55,19 +123,81 @@
                 $.ajax({
                     url:'http://localhost:8083/manage/getArticles',
                     type:'POST',
-                    data:{'page':page,'count':pageSize},
+                    data:{'page':page,'pageSize':pageNum},
                     dataType:'JSON',
                     success:function (callback) {
-                            $('tbody').empty();
-                            var page_count=callback.page_count;
-                            var page_cont=callback.page_content;
-                            $('tbody').append(page_cont);
-                            $('#last_page').text(page_count)
+                            var list = callback.data.list;
+                            var str = '';
+                            for(var i=0;i<list.length;i++){
+                                str += '<div class="panel panel-default"><div class="panel-heading">'+ list[i].title+'作者：'+list[i].nickname+'时间'+ list[i].createTime +'</div><div class="panel-body">'+list[i].content+'</div></div>';
+                            }
+                            $('#content').html(str);
+                            totalPage = callback.data.totalPage;
+                            $('#last_page').text(totalPage);
                         }
                 })
             }
         });
-    });
+    }
+    function picMange(){
+        $(".main").css("display","none");
+        $(".main").eq(3).style("display","block");
+
+    }
+    function ipManage(){
+        $(".main").css("display","none");
+        $(".main").eq(4).css("display","block");
+
+    }
+    function chatManage(){
+        $(".main").css("display","none");
+        $(".main").eq(5).css("display","block");
+
+    }
+
+
+    function login(){
+        var username = $("#username");
+        var password = $("#password");
+        $.ajax({
+            url:'http://localhost:8083/manage/login',
+            type:'POST',
+            async: false,
+            data:{
+                'username':username,
+                'password':password
+            },
+            dataType:'JSON',
+            success:function (callback) {
+                if(callback.code=="200"){
+                    $(".main").eq(0).html('<h2>已登录</h2>');
+                } else {
+                    alert("用户名或密码错误，请重新登录");
+                }
+            }
+        });
+    }
+    function checkLogin(){
+        //var loginFlag = 0;
+        $.ajax({
+            url:'http://localhost:8083/manage/checkLogin',
+            type:'POST',
+            async: false,
+            data:{'page':page,'pageSize':pageNum},
+            dataType:'JSON',
+            success:function (callback) {
+                if(callback.code=="200"){
+                    if(callback.code.data=="1"){
+                        return true;
+                    }
+                } else {
+                    return false;
+                }
+            }
+        });
+        //return loginFlag;
+    }
+    
 
 </script>
 </body>
