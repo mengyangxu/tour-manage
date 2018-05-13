@@ -1,4 +1,7 @@
     function tologin(){
+        clearClass();
+        $("li").eq(0).addClass("active");
+
         $(".main").css("display","none");
         $(".main").eq(0).css("display","block");
 
@@ -8,6 +11,15 @@
         
     }
     function userManage(){
+        if(checkLogin()=='0'){
+            alert("请先登录");
+            tologin();
+            return;
+        }
+
+        clearClass();
+        $("li").eq(1).addClass("active");
+
         $(".main").css("display","none");
         $(".main").eq(1).css("display","block");
         //查看所有用户信息
@@ -44,72 +56,83 @@
 
     }
     function articleManage(){
-        var flag = checkLogin();
-        if(flag==0){
+        if(checkLogin()=='0'){
+            alert("请先登录");
             tologin();
-        }else{
-
-            $(".main").css("display","none");
-            $(".main").eq(2).css("display","block");
-
-            var pageNum = 4;
-            var totalPage = 3;
-
-            $.ajax({
-                url:'http://localhost:8083/manage/getArticles',
-                type:'POST',
-                async: false,
-                data:{'page':1,'pageSize':pageNum},
-                dataType:'JSON',
-                success:function (callback) {
-                    var list = callback.data.list;
-                    var str = '';
-                    for(var i=0;i<list.length;i++){
-                        str += '<div class="panel panel-default"><div class="panel-heading">'+ list[i].title+'作者：'+list[i].nickname+'时间'+ list[i].createTime +'<a style="float:right;" onclick="delArticle('+ list[i].id +');">删除</a></div><div class="panel-body">'+list[i].content+'</div></div>';
-                    }
-                    $('#content').html(str);
-                    totalPage = callback.data.totalPage;
-                    $('#last_page').text(totalPage);
-                }
-            });
-            $('#pageLimit').bootstrapPaginator({
-                currentPage: 1,
-                totalPages: totalPage,
-                size:"normal",
-                bootstrapMajorVersion: 3,
-                alignment:"right",
-                itemTexts: function (type, page, current) {
-                    switch (type) {
-                    case "first": return "首页";
-                    case "prev": return "上一页";
-                    case "next": return "下一页";
-                    case "last": return "末页";
-                    case "page": return page;
-                    }//默认显示的是第一页。
-                },
-                onPageClicked: function (event, originalEvent, type, page){//给每个页眉绑定一个事件，其实就是ajax请求，其中page变量为当前点击的页上的数字。
-                    $.ajax({
-                        url:'http://localhost:8083/manage/getArticles',
-                        type:'POST',
-                        data:{'page':page,'pageSize':pageNum},
-                        dataType:'JSON',
-                        success:function (callback) {
-                                var list = callback.data.list;
-                                var str = '';
-                                for(var i=0;i<list.length;i++){
-                                    str += '<div class="panel panel-default"><div class="panel-heading">'+ list[i].title+'作者：'+list[i].nickname+'时间'+ list[i].createTime +'<a style="float:right;" onclick="delArticle('+ list[i].id +');">删除</a></div><div class="panel-body">'+list[i].content+'</div></div>';
-                                }
-                                $('#content').html(str);
-                                totalPage = callback.data.totalPage;
-                                $('#last_page').text(totalPage);
-                            }
-                    })
-                }
-            });
-
+            return;
         }
+
+        clearClass();
+        $("li").eq(2).addClass("active");
+
+        $(".main").css("display","none");
+        $(".main").eq(2).css("display","block");
+
+        var pageNum = 4;
+        var totalPage = 3;
+
+        $.ajax({
+            url:'http://localhost:8083/manage/getArticles',
+            type:'POST',
+            async: false,
+            data:{'page':1,'pageSize':pageNum},
+            dataType:'JSON',
+            success:function (callback) {
+                var list = callback.data.list;
+                var str = '';
+                for(var i=0;i<list.length;i++){
+                    str += '<div class="panel panel-default"><div class="panel-heading">'+ list[i].title+'作者：'+list[i].nickname+'时间'+ list[i].createTime +'<a style="float:right;" onclick="delArticle('+ list[i].id +');">删除</a></div><div class="panel-body">'+list[i].content+'</div></div>';
+                }
+                $('#content').html(str);
+                totalPage = callback.data.totalPage;
+                $('#last_page').text(totalPage);
+            }
+        });
+        $('#pageLimit').bootstrapPaginator({
+            currentPage: 1,
+            totalPages: totalPage,
+            size:"normal",
+            bootstrapMajorVersion: 3,
+            alignment:"right",
+            itemTexts: function (type, page, current) {
+                switch (type) {
+                case "first": return "首页";
+                case "prev": return "上一页";
+                case "next": return "下一页";
+                case "last": return "末页";
+                case "page": return page;
+                }//默认显示的是第一页。
+            },
+            onPageClicked: function (event, originalEvent, type, page){//给每个页眉绑定一个事件，其实就是ajax请求，其中page变量为当前点击的页上的数字。
+                $.ajax({
+                    url:'http://localhost:8083/manage/getArticles',
+                    type:'POST',
+                    data:{'page':page,'pageSize':pageNum},
+                    dataType:'JSON',
+                    success:function (callback) {
+                            var list = callback.data.list;
+                            var str = '';
+                            for(var i=0;i<list.length;i++){
+                                str += '<div class="panel panel-default"><div class="panel-heading">'+ list[i].title+'作者：'+list[i].nickname+'时间'+ list[i].createTime +'<a style="float:right;" onclick="delArticle('+ list[i].id +');">删除</a></div><div class="panel-body">'+list[i].content+'</div></div>';
+                            }
+                            $('#content').html(str);
+                            totalPage = callback.data.totalPage;
+                            $('#last_page').text(totalPage);
+                        }
+                })
+            }
+        });
     }
     function commentManage(){
+        if(checkLogin()=='0'){
+            alert("请先登录");
+            tologin();
+            return;
+        }
+
+        clearClass();
+        $("li").eq(3).addClass("active");
+
         $(".main").css("display","none");
         $(".main").eq(3).css("display","block");
 
@@ -137,6 +160,15 @@
         });
     }
     function ipManage(){
+        if(checkLogin()=='0'){
+            alert("请先登录");
+            tologin();
+            return;
+        }
+
+        clearClass();
+        $("li").eq(4).addClass("active");
+
         $(".main").css("display","none");
         $(".main").eq(4).css("display","block");
 
@@ -169,6 +201,15 @@
         });
     }
     function chatManage(){
+        if(checkLogin()=='0'){
+            alert("请先登录");
+            tologin();
+            return;
+        }
+
+        clearClass();
+        $("li").eq(5).addClass("active");
+
         $(".main").css("display","none");
         $(".main").eq(5).css("display","block");
 
@@ -201,8 +242,9 @@
     function login(){
         var username = $("#username").val();
         var password = $("#password").val();
+
         $.ajax({
-            url:'http://localhost:8083/manage/login',
+            url:'http://localhost:8082/admin/login',
             type:'POST',
             async: false,
             data:{
@@ -212,6 +254,8 @@
             dataType:'JSON',
             success:function (callback) {
                 if(callback.code=="200"){
+                    //$.cookie('key', callback.data, {expires: 7, secure: false });
+                    $("#key").val(callback.data);
                     $(".main").eq(0).html('<h2>已登录</h2>');
                 } else {
                     alert("用户名或密码错误，请重新登录");
@@ -221,18 +265,24 @@
     }
     function checkLogin(){
         var loginFlag = 0;
+        //var key = $.cookie('key');
+        var key = $("#key").val();
+        if(null==key||""==key){
+            return loginFlag;
+        }
         $.ajax({
-            url:'http://localhost:8083/manage/checkLogin',
+            url:'http://localhost:8082/admin/checkLogin',
             type:'POST',
             async: false,
+            data: {
+                'key':key
+            },
             dataType:'JSON',
             success:function (callback) {
                 if(callback.code=="200"){
-                    if(callback.data=="1"){
-                        loginFlag = 1;
-                    }
+                    loginFlag = 1;
                 } else {
-                    
+                    loginFlag = 0;
                 }
             }
         });
@@ -320,4 +370,8 @@
         });
         userManage();
 
+    }
+
+    function clearClass(){
+        $("li").removeClass("active");
     }
